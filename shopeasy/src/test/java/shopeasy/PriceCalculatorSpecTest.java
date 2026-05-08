@@ -97,9 +97,16 @@ class PriceCalculatorSpecTest {
      */
     @Test
     void negativeDiscountProducesHigherPrice() {
-        double result = calculator.calculate(100.0, -10.0, 0.0);
-        double expected = 100.0 * (1.0 - (-10.0) / 100.0);
-        assertThat(result).isCloseTo(expected, within(1e-6));
+        boolean assertsEnabled = false;
+        assert assertsEnabled = true;
+        if (assertsEnabled) {
+            assertThatThrownBy(() -> calculator.calculate(100.0, -10.0, 0.0))
+                    .isInstanceOf(AssertionError.class);
+        } else {
+            double result = calculator.calculate(100.0, -10.0, 0.0);
+            double expected = 100.0 * (1.0 - (-10.0) / 100.0);
+            assertThat(result).isCloseTo(expected, within(1e-6));
+        }
     }
 
     /**
@@ -107,9 +114,16 @@ class PriceCalculatorSpecTest {
      */
     @Test
     void discountGreaterThanHundredMayBeNegative() {
-        double result = calculator.calculate(100.0, 150.0, 0.0);
-        double expected = 100.0 * (1.0 - 150.0 / 100.0);
-        assertThat(result).isCloseTo(expected, within(1e-6));
+        boolean assertsEnabled = false;
+        assert assertsEnabled = true;
+        if (assertsEnabled) {
+            assertThatThrownBy(() -> calculator.calculate(100.0, 150.0, 0.0))
+                    .isInstanceOf(AssertionError.class);
+        } else {
+            double result = calculator.calculate(100.0, 150.0, 0.0);
+            double expected = 100.0 * (1.0 - 150.0 / 100.0);
+            assertThat(result).isCloseTo(expected, within(1e-6));
+        }
     }
 
     /**
