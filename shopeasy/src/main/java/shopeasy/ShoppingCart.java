@@ -7,14 +7,18 @@ import java.util.List;
 /**
  * A mutable shopping cart that holds {@link CartItem}s.
  *
- * <p><strong>Contracts (Task 3 – Design by Contract):</strong>
+ * <p>
+ * <strong>Contracts (Task 3 – Design by Contract):</strong>
  * <ul>
- *   <li>Students are required to add {@code assert} pre-/post-condition statements
- *       to {@link #addItem(Product, int)} and {@link #applyDiscount(double)} as
- *       part of Task 3. The Javadoc below describes the expected contracts.</li>
+ * <li>Students are required to add {@code assert} pre-/post-condition
+ * statements
+ * to {@link #addItem(Product, int)} and {@link #applyDiscount(double)} as
+ * part of Task 3. The Javadoc below describes the expected contracts.</li>
  * </ul>
  *
- * <p><strong>Invariant:</strong> {@link #total()} is always &gt;= 0 after any operation.
+ * <p>
+ * <strong>Invariant:</strong> {@link #total()} is always &gt;= 0 after any
+ * operation.
  */
 public class ShoppingCart {
 
@@ -24,7 +28,9 @@ public class ShoppingCart {
      * Adds a product to the cart. If the product is already present, the quantities
      * are combined into the existing cart line.
      *
-     * <p><em>Pre-condition (Task 3):</em> {@code product != null}, {@code quantity > 0}<br>
+     * <p>
+     * <em>Pre-condition (Task 3):</em> {@code product != null},
+     * {@code quantity > 0}<br>
      * <em>Post-condition (Task 3):</em> cart contains an entry for {@code product};
      * total number of distinct items in the cart >= previous count.
      *
@@ -32,17 +38,26 @@ public class ShoppingCart {
      * @param quantity number of units to add (must be > 0)
      */
     public void addItem(Product product, int quantity) {
-        // TODO (Task 3): add assert pre-condition here
+        // product must not be null, quantity must be > 0
+        assert product != null : "product must not be null";
+        assert quantity > 0 : "quantity must be > 0";
 
+        int prevCount = itemCount();
         for (CartItem item : items) {
             if (item.getProduct().getId().equals(product.getId())) {
                 item.setQuantity(item.getQuantity() + quantity);
-                // TODO (Task 3): add assert post-condition here
+                // Post-condition: number of distinct lines should not decrease
+                assert itemCount() >= prevCount : "post-condition: itemCount must not decrease";
+                // Invariant: total() must remain non-negative
+                assert total() >= 0 : "invariant: total must be >= 0";
                 return;
             }
         }
         items.add(new CartItem(product, quantity));
-        // TODO (Task 3): add assert post-condition here
+        // item count did not decrease
+        assert itemCount() >= prevCount : "post-condition: itemCount must not decrease";
+        // total() must be non-negative after modification
+        assert total() >= 0 : "invariant: total must be >= 0";
     }
 
     /**
@@ -53,6 +68,8 @@ public class ShoppingCart {
      */
     public void removeItem(String productId) {
         items.removeIf(item -> item.getProduct().getId().equals(productId));
+        // total must be non-negative after removal
+        assert total() >= 0 : "invariant: total must be >= 0";
     }
 
     /**
@@ -63,10 +80,15 @@ public class ShoppingCart {
      * @throws IllegalArgumentException if the product is not in the cart
      */
     public void updateQuantity(String productId, int quantity) {
-        if (quantity <= 0) throw new IllegalArgumentException("Quantity must be > 0");
+        // quantity must be > 0
+        assert quantity > 0 : "quantity must be > 0";
+        if (quantity <= 0)
+            throw new IllegalArgumentException("Quantity must be > 0");
         for (CartItem item : items) {
             if (item.getProduct().getId().equals(productId)) {
                 item.setQuantity(quantity);
+                // total() must remain non-negative
+                assert total() >= 0 : "invariant: total must be >= 0";
                 return;
             }
         }
@@ -74,11 +96,15 @@ public class ShoppingCart {
     }
 
     /**
-     * Applies a percentage discount to the current total and returns the discounted total.
-     * The discount is applied <em>on top of</em> the raw subtotal; it does not persist
-     * between calls (i.e., calling this method twice with 10% does not compound discounts).
+     * Applies a percentage discount to the current total and returns the discounted
+     * total.
+     * The discount is applied <em>on top of</em> the raw subtotal; it does not
+     * persist
+     * between calls (i.e., calling this method twice with 10% does not compound
+     * discounts).
      *
-     * <p><em>Pre-condition (Task 3):</em> {@code 0 <= discountRate <= 100}<br>
+     * <p>
+     * <em>Pre-condition (Task 3):</em> {@code 0 <= discountRate <= 100}<br>
      * <em>Post-condition (Task 3):</em> returned value &lt;= {@link #total()} when
      * {@code discountRate > 0}.
      *
@@ -86,12 +112,19 @@ public class ShoppingCart {
      * @return the total after applying the discount
      */
     public double applyDiscount(double discountRate) {
-        // TODO (Task 3): add assert pre-condition here
+        // discountRate in [0,100]
+        assert discountRate >= 0 && discountRate <= 100 : "discountRate must be in [0,100]";
 
         double rawTotal = total();
         double discounted = rawTotal - (rawTotal * discountRate / 100);
 
-        // TODO (Task 3): add assert post-condition here
+        // if a positive discount was requested, returned value
+        // should be less than or equal to the raw total
+        if (discountRate > 0) {
+            assert discounted <= rawTotal : "post-condition: discounted total must be <= raw total";
+        }
+        // cart total remains non-negative
+        assert total() >= 0 : "invariant: total must be >= 0";
         return discounted;
     }
 
@@ -109,7 +142,8 @@ public class ShoppingCart {
     }
 
     /**
-     * Returns the number of distinct product lines in the cart (not the total unit count).
+     * Returns the number of distinct product lines in the cart (not the total unit
+     * count).
      */
     public int itemCount() {
         return items.size();
@@ -127,6 +161,8 @@ public class ShoppingCart {
      */
     public void clear() {
         items.clear();
+        // total must be non-negative after clearing
+        assert total() >= 0 : "invariant: total must be >= 0";
     }
 
     @Override
