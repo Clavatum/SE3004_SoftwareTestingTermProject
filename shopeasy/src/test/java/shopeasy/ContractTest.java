@@ -1,72 +1,75 @@
 package shopeasy;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
- * Task 3 – Design by Contract (Chapter 4)
+ * Task 3 — Design by Contract tests.
  *
- * <p>This task has two parts:
- *
- * <h3>Part A – Add contracts to production code</h3>
- * Open {@link ShoppingCart} and {@link PriceCalculator} and add {@code assert}
- * statements for the pre-conditions and post-conditions described in their Javadoc.
- * Note: assertions are enabled via {@code -ea} in Maven Surefire (already configured
- * in {@code pom.xml}).
- *
- * <p>Contracts to implement:
- * <ul>
- *   <li><b>ShoppingCart.addItem</b>: pre — {@code product != null}, {@code quantity > 0};
- *       post — {@code itemCount()} increased or product quantity updated.</li>
- *   <li><b>ShoppingCart.applyDiscount</b>: pre — {@code 0 <= discountRate <= 100};
- *       post — result &lt;= {@code total()} when {@code discountRate > 0}.</li>
- *   <li><b>PriceCalculator.calculate</b>: pre — {@code basePrice >= 0},
- *       {@code 0 <= discountRate <= 100}, {@code 0 <= taxRate <= 100};
- *       post — result {@code >= 0}.</li>
- *   <li><b>ShoppingCart invariant</b>: {@code total() >= 0} after any operation.</li>
- * </ul>
- *
- * <h3>Part B – Write contract tests</h3>
- * Write tests below that:
- * <ol>
- *   <li>Verify contracts hold for valid inputs (positive tests).</li>
- *   <li>Verify contracts are violated ({@code AssertionError}) for invalid inputs (negative tests).</li>
- * </ol>
- *
- * <p>Use {@code assertThatThrownBy(...).isInstanceOf(AssertionError.class)} to test violations.
+ * Verifies that assert-based pre/post-conditions hold for valid inputs and
+ * that invalid inputs trigger AssertionError when assertions are enabled.
  */
 class ContractTest {
 
-    private ShoppingCart cart;
-    private PriceCalculator calculator;
-    private Product product;
-
-    @BeforeEach
-    void setUp() {
-        cart       = new ShoppingCart();
-        calculator = new PriceCalculator();
-        product    = new Product("P001", "Widget", 10.0, 50);
+    @BeforeAll
+    static void ensureAssertionsEnabled() {
+        boolean assertsEnabled = false;
+        // This assert will flip assertsEnabled to true only when JVM assertions are
+        // enabled (-ea).
+        assert assertsEnabled = true;
+        assumeTrue(assertsEnabled, "Assertions must be enabled (-ea) to run contract tests");
     }
 
-    // -----------------------------------------------------------------------
-    // TODO: Write your contract tests below.
-    //
-    // EXAMPLE — pre-condition violation (fill in the correct assertion):
-    //
-    // @Test
-    // void addItem_nullProduct_shouldViolatePreCondition() {
-    //     assertThatThrownBy(() -> cart.addItem(null, 1))
-    //             .isInstanceOf(AssertionError.class);
-    // }
-    //
-    // EXAMPLE — pre-condition holds (valid input):
-    //
-    // @Test
-    // void addItem_validInput_shouldNotThrow() {
-    //     assertThatCode(() -> cart.addItem(product, 3)).doesNotThrowAnyException();
-    // }
-    // -----------------------------------------------------------------------
+    @Test
+    void priceCalculatorValidInputsHoldContracts() {
+        PriceCalculator calc = new PriceCalculator();
+        double res = calc.calculate(100.0, 10.0, 5.0);
+        // result must be >= 0
+        assertThat(res).isGreaterThanOrEqualTo(0.0);
+        // Formula sanity check
+        assertThat(res).isCloseTo((100.0 * 0.9) * 1.05, within(1e-6));
+    }
+
+    @Test
+    void priceCalculatorPreconditionsViolatedThrowAssertion() {
+        PriceCalculator calc = new PriceCalculator();
+        assertThatThrownBy(() -> calc.calculate(-1.0, 0.0, 0.0)).isInstanceOf(AssertionError.class);
+        assertThatThrownBy(() -> calc.calculate(10.0, -5.0, 0.0)).isInstanceOf(AssertionError.class);
+        assertThatThrownBy(() -> calc.calculate(10.0, 0.0, -1.0)).isInstanceOf(AssertionError.class);
+        assertThatThrownBy(() -> calc.calculate(10.0, 150.0, 0.0)).isInstanceOf(AssertionError.class);
+        assertThatThrownBy(() -> calc.calculate(10.0, 0.0, 150.0)).isInstanceOf(AssertionError.class);
+    }
+
+    @Test
+    void shoppingCartAddItemContractsHoldAndViolatedCases() {
+        ShoppingCart cart = new ShoppingCart();
+        Product apple = new Product("P001", "Apple", 1.50, 100);
+
+        int before = cart.itemCount();
+        cart.addItem(apple, 2);
+        assertThat(cart.itemCount()).isGreaterThanOrEqualTo(before);
+        assertThat(cart.total()).isGreaterThanOrEqualTo(0.0);
+
+        // Pre-condition violations
+        assertThatThrownBy(() -> cart.addItem(null, 1)).isInstanceOf(AssertionError.class);
+        assertThatThrownBy(() -> cart.addItem(apple, 0)).isInstanceOf(AssertionError.class);
+    }
+
+    @Test
+    void shoppingCartApplyDiscountContracts() {
+        ShoppingCart cart = new ShoppingCart();
+        Product p = new Product("P010", "Thing", 10.0, 10);
+        cart.addItem(p, 2);
+        double before = cart.total();
+        double after = cart.applyDiscount(10);
+        assertThat(after).isLessThan(before);
+
+        // Invalid discounts should trigger assertion
+        assertThatThrownBy(() -> cart.applyDiscount(-1.0)).isInstanceOf(AssertionError.class);
+        assertThatThrownBy(() -> cart.applyDiscount(150.0)).isInstanceOf(AssertionError.class);
+    }
 
 }
