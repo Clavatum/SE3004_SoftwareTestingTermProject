@@ -1,7 +1,7 @@
 # ShopEasy – Term Project Starter
 
 **Course:** Software Testing  
-**Textbook:** *Effective Software Testing* – Aniche  
+**Textbook:** _Effective Software Testing_ – Aniche  
 **Chapters covered:** 1–6
 
 ---
@@ -10,7 +10,7 @@
 
 ```bash
 # 1. Clone the repository
-git clone <your-fork-url>
+git clone https://github.com/Clavatum/SE3004_SoftwareTestingTermProject.git
 cd shopeasy-tests
 
 # 2. Compile and run all tests
@@ -52,27 +52,27 @@ report/
 
 ## Task Overview
 
-| Task | Technique | Chapter | Weight |
-|------|-----------|---------|--------|
-| 1 | Specification-Based Testing | Ch. 2 | 20 pts |
-| 2 | Structural Testing & Code Coverage | Ch. 3 | 20 pts |
-| 3 | Design by Contract | Ch. 4 | 15 pts |
-| 4 | Property-Based Testing | Ch. 5 | 20 pts |
-| 5 | Mocks & Stubs | Ch. 6 | 20 pts |
-| 6 | Reflection Report | Ch. 1–6 | 5 pts  |
+| Task | Technique                          | Chapter | Weight |
+| ---- | ---------------------------------- | ------- | ------ |
+| 1    | Specification-Based Testing        | Ch. 2   | 20 pts |
+| 2    | Structural Testing & Code Coverage | Ch. 3   | 20 pts |
+| 3    | Design by Contract                 | Ch. 4   | 15 pts |
+| 4    | Property-Based Testing             | Ch. 5   | 20 pts |
+| 5    | Mocks & Stubs                      | Ch. 6   | 20 pts |
+| 6    | Reflection Report                  | Ch. 1–6 | 5 pts  |
 
 See the project assignment document for full task descriptions and grading criteria.
 
 ## Dependencies
 
-| Library | Purpose | Version |
-|---------|---------|---------|
-| JUnit 5 | Test runner | 5.10.2 |
-| jqwik | Property-based testing (Task 4) | 1.8.3 |
-| Mockito | Mocking (Task 5) | 5.11.0 |
-| AssertJ | Fluent assertions | 3.25.3 |
-| JaCoCo | Code coverage (Task 2) | 0.8.12 |
-| PIT | Mutation testing (Task 2 bonus) | 1.15.8 |
+| Library | Purpose                         | Version |
+| ------- | ------------------------------- | ------- |
+| JUnit 5 | Test runner                     | 5.10.2  |
+| jqwik   | Property-based testing (Task 4) | 1.8.3   |
+| Mockito | Mocking (Task 5)                | 5.11.0  |
+| AssertJ | Fluent assertions               | 3.25.3  |
+| JaCoCo  | Code coverage (Task 2)          | 0.8.12  |
+| PIT     | Mutation testing (Task 2 bonus) | 1.15.8  |
 
 ## Submission Checklist
 
